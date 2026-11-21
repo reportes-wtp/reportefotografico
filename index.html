@@ -211,11 +211,12 @@ $('gen').onclick=async()=>{
     const blob=doc.output('blob');
     const mb=(blob.size/1048576).toFixed(1);
     lastPdf={blob,name};bajar();$('share').hidden=!canShare(blob,name);$('again').hidden=false;
-    msg('Listo: '+name+' ('+mb+' MB)'+(bad?' · '+bad+' foto(s) no se pudieron leer':''),!!bad);
+    photos.forEach(p=>URL.revokeObjectURL(p.url));photos=[];$('nm').value='';store.set('rf_nm','');
+    msg('Listo: '+name+' ('+mb+' MB) · Formulario limpio para el siguiente'+(bad?' · '+bad+' foto(s) no se pudieron leer':''),!!bad);
   }catch(e){
     const c=e&&e.code;
     msg('No se pudo generar el PDF: '+(e&&e.message||e),true);
-  }finally{busy=false;$('prog').style.display='none';bar.style.width='0';upd()}
+  }finally{busy=false;$('prog').style.display='none';bar.style.width='0';render()}
 };
 function bajar(){if(!lastPdf)return;const u=URL.createObjectURL(lastPdf.blob),a=document.createElement('a');a.href=u;a.download=lastPdf.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)}
 function canShare(b,n){try{return !!(navigator.canShare&&navigator.canShare({files:[new File([b],n,{type:'application/pdf'})]}))}catch(e){return false}}
